@@ -4,8 +4,8 @@
 - [x] Viết mã để tăng gia trị biến program counter
 - [ ] Cài đặt system call int ReadNum()
 - [ ] Cài đặt system call void PrintNum(int number)
-- [ ] Cài đặt system call char ReadChar()
-- [ ] Cài đặt system call void PrintChar(char character)
+- [x] Cài đặt system call char ReadChar()
+- [x] Cài đặt system call void PrintChar(char character)
 - [ ] Cài đặt system call int RandomNum()
 - [x] Cài đặt đặt system call void ReadString (char[] buffer, int length)
 - [x] Cài đặt system call void PrintString (char[] buffer)
