@@ -151,8 +151,38 @@ void SysPrintChar(char character)
 #define max_num_length 11
 //include minus sign 
 //int32 range: -2,147,483,648 to 2,147,483,647
+#define LF ((char) 10)
+#define CR ((char) 13)
+#define TAB ((char) 9)
+#define SPACE ((char) ' ')
 
 char num_buffer[max_num_length+2];
+
+char isBlank(char c)
+{
+    return c == LF || c == CR || c == TAB || c == SPACE;
+}
+
+bool compareNumVsString(int integer, const char *s) {
+    if (integer == 0) return strcmp(s, "0") == 0;
+
+    int len = strlen(s);
+
+    if (integer < 0 && s[0] != '-') return false;
+
+    if (integer < 0) s++, --len, integer = -integer;
+
+    while (integer > 0) {
+        int digit = integer % 10;
+
+        if (s[len - 1] - '0' != digit) return false;
+
+        --len;
+        integer /= 10;
+    }
+
+    return len == 0;
+}
 
 void SysPrintNum(int num) {
     if (num == 0) return kernel->synchConsoleOut->PutChar('0');//neu = 0 thi in ra 0
@@ -176,6 +206,92 @@ void SysPrintNum(int num) {
     }
     for (int i = n - 1; i >= 0; --i)
         kernel->synchConsoleOut->PutChar(num_buffer[i] + '0');
+}
+
+int SysReadNum()
+{
+    memset(num_buffer, 0, sizeof(num_buffer));
+    char c = kernel->synchConsoleIn->GetChar();
+
+    if (c == EOF) {
+        DEBUG(dbgSys, "(!) End of file");
+        return;
+    }
+
+    if (isBlank(c)) {
+        DEBUG(dbgSys, "(!) White-space found");
+        return;
+    }
+
+    int n = 0;
+
+    while (!(isBlank(c) || c == EOF)) {
+        num_buffer[n++] = c;
+        if (n > max_num_length) {
+            DEBUG(dbgSys, "Number is too long");
+            return;
+        }
+        c = kernel->synchConsoleIn->GetChar();
+    }
+
+    int len = strlen(num_buffer);
+    // Read nothing -> return 0
+    if (len == 0) return 0;
+
+    if (strcmp(num_buffer, "-2147483648") == 0) return INT32_MIN;
+
+    bool nega = (num_buffer[0] == '-');
+    int zeros = 0;
+    bool is_leading = true;
+    int num = 0;
+    for (int i = nega; i < len; ++i) {
+        char c = num_buffer[i];
+        if (c == '0' && is_leading)
+            ++zeros;
+        else
+            is_leading = false;
+        if (c < '0' || c > '9') {
+            DEBUG(dbgSys, "Number expected but " << num_buffer << " found");
+            return 0;
+        }
+        num = num * 10 + (c - '0');
+    }
+
+    // 00,01 or -0
+    if (zeros > 1 || (zeros && (num || nega))) {
+        DEBUG(dbgSys, "Number expected but " << num_buffer << " found");
+        return 0;
+    }
+
+    if (nega)
+        /**
+         * This is why we need to handle -2147483648 individually:
+         * 2147483648 is larger than the range of int32
+         */
+        num = -num;
+
+    // It's safe to return directly if the number is small
+    if (len <= max_num_length - 2) return num;
+
+    /**
+     * We need to make sure that number is equal to the number in the buffer.
+     *
+     * It's impossible to tell whether the number is bigger
+     * than INT32_MAX or smaller than INT32_MIN if it has the same length.
+     *
+     * For example: 3 000 000 000.
+     *
+     * In that case, that number will cause an overflow. However, C++
+     * doens't raise integer overflow, so we need to make sure that the input
+     * string and the output number is equal.
+     *
+     */
+    if (compareNumVsString(num, num_buffer))
+        return num;
+    else
+        DEBUG(dbgSys, "Should be int32 number");
+
+    return 0;
 }
 
 int SysRandomNum() {

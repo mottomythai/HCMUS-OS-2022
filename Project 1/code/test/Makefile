@@ -176,6 +176,12 @@ chartest: chartest.o start.o
 	$(LD) $(LDFLAGS) start.o chartest.o -o chartest.coff
 	$(COFF2NOFF) chartest.coff chartest
 
+num_io.o: num_io.c
+	$(CC) $(CFLAGS) -c num_io.c
+num_io: num_io.o num_io.o
+	$(LD) $(LDFLAGS) start.o num_io.o -o num_io.coff
+	$(COFF2NOFF) num_io.coff num_io
+
 ascii.o: ascii.c
 	$(CC) $(CFLAGS) -c ascii.c
 ascii: ascii.o start.o

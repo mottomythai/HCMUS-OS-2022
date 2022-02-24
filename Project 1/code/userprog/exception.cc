@@ -129,6 +129,13 @@ void handle_SC_Sort()
 	increasePC();
 }
 
+void handle_SC_ReadNum()
+{
+	int result = SysReadNum();
+	kernel->machine->WriteRegister(2, result);
+	increasePC();
+}
+
 void handle_SC_PrintNum() {
     int character = kernel->machine->ReadRegister(4);
     SysPrintNum(character);
@@ -150,6 +157,27 @@ void ExceptionHandler(ExceptionType which)
 
 	switch (which)
 	{
+	case NoException: // Return control to kernel
+		kernel->interrupt->setStatus(SystemMode);
+		DEBUG(dbgSys, "Switch to system mode\n");
+		break;
+
+	case PageFaultException:	// No valid translation found
+	case ReadOnlyException:		// Write attempted to page marked 
+								// "read-only"
+	case BusErrorException:		// Translation resulted in an 
+								// invalid physical address
+	case AddressErrorException:	// Unaligned reference or one that
+								// was beyond the end of the
+								// address space
+	case OverflowException:		// Integer overflow in add or sub.
+	case IllegalInstrException:	// Unimplemented or reserved instr.
+	case NumExceptionTypes:
+		PrintString("<!> 1 error occurs", 18);
+		cerr << "(!) Error " << which << " occurs\n";
+		SysHalt();
+		ASSERTNOTREACHED();
+
 	case SyscallException:
 		switch (type)
 		{
@@ -192,6 +220,9 @@ void ExceptionHandler(ExceptionType which)
 			return;
 		case SC_PrintChar:
 			handle_SC_PrintChar();
+			return;
+		case SC_ReadNum:
+			handle_SC_ReadNum();
 			return;
 		case SC_PrintNum:
             handle_SC_PrintNum();
