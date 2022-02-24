@@ -39,7 +39,9 @@
 #define SC_PrintString   46
 #define SC_ReadChar 47
 #define SC_PrintChar 48
-
+#define SC_Sort 100
+#define SC_PrintNum 49
+#define SC_RandomNum 50
 #define SC_Add		42
 
 #define MaxFileLength 32
@@ -71,12 +73,17 @@ int Add(int op1, int op2);
 
 void ReadString(char* str, int len);
 
-void PrintString(char* str);
+void PrintString(char* str, int len);
 
 char ReadChar();
 
 void PrintChar(char character);
 
+void Sort(int *arr, int size);
+
+void PrintNum(int num);
+
+int RandomNum();
 
 /* Address space control operations: Exit, Exec, Execv, and Join */
 

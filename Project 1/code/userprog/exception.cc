@@ -50,57 +50,6 @@
 //	is in machine.h.
 //----------------------------------------------------------------------
 
-/*
-Input: - User space address (int)
-- Limit of buffer (int)
-Output:- Buffer (char*)
-Purpose: Copy buffer from User memory space to System memory space
-*/
-char *User2System(int virtAddr, int limit)
-{
-	int i; // index
-	int oneChar;
-	char *kernelBuf = NULL;
-	kernelBuf = new char[limit + 1]; // need for terminal string
-	if (kernelBuf == NULL)
-		return kernelBuf;
-	memset(kernelBuf, 0, limit + 1);
-	// printf("\n Filename u2s:");
-	for (i = 0; i < limit; i++)
-	{
-		kernel->machine->ReadMem(virtAddr + i, 1, &oneChar);
-		kernelBuf[i] = (char)oneChar;
-		// printf("%c",kernelBuf[i]);
-		if (oneChar == 0)
-			break;
-	}
-	return kernelBuf;
-}
-
-/*
-Input: - User space address (int)
-- Limit of buffer (int)
-- Buffer (char[])
-Output:- Number of bytes copied (int)
-Purpose: Copy buffer from System memory space to User memory space
-*/
-int System2User(int virtAddr, int len, char *buffer)
-{
-	if (len < 0)
-		return -1;
-	if (len == 0)
-		return len;
-	int i = 0;
-	int oneChar = 0;
-	do
-	{
-		oneChar = (int)buffer[i];
-		kernel->machine->WriteMem(virtAddr + i, 1, oneChar);
-		i++;
-	} while (i < len && oneChar != 0);
-	return i;
-}
-
 /* Modify return point */
 void increasePC()
 {
@@ -121,14 +70,14 @@ void handleSC_ReadStr()
 	{
 		// TODO: Rewrite this
 		char errMsg[] = "String too long";
-		SysPrintString(errMsg, 16);
+		SysPrintString(errMsg, strlen(errMsg));
 		SysHalt();
 		// END_TODO
 	}
 
 	char *str = SysReadString(strLen);
 
-	str2user(str, strAddress);
+	System2User(strAddress, strlen(str), str);
 	delete[] str;
 	increasePC();
 }
@@ -136,7 +85,8 @@ void handleSC_ReadStr()
 void handleSC_PrintStr()
 {
 	int strAddress = kernel->machine->ReadRegister(4);
-	char *buff = str2sys(strAddress);
+	int strLimit = kernel->machine->ReadRegister(5);
+	char *buff = User2System(strAddress, strLimit);
 
 	DEBUG(dbgSys, "\n[DEBUG]: string '" << buff << "' has the length of " << strlen(buff) << "");
 	SysPrintString(buff, strlen(buff));
@@ -148,7 +98,6 @@ void handle_SC_ReadChar()
 {
 	char result = SysReadChar();
 	kernel->machine->WriteRegister(2, (int)result);
-	DEBUG(dbgSys, "READ CHAR");
 	increasePC();
 }
 
@@ -156,9 +105,41 @@ void handle_SC_PrintChar()
 {
 	char character = (char)kernel->machine->ReadRegister(4);
 	SysPrintChar(character);
-	DEBUG(dbgSys, "PRINT CHAR");
 
 	increasePC();
+}
+
+void handle_SC_Sort()
+{
+	DEBUG(dbgSys, "Enter Sorting:");
+	int addr = kernel->machine->ReadRegister(4);
+	int size = kernel->machine->ReadRegister(5);
+
+	int *arr = SysSort(addr, size);
+
+	DEBUG(dbgSys, "Sorting:");
+	if(debug->IsEnabled(dbgSys))
+	{
+		for(int i = 0; i < size; ++i)
+			DEBUG(dbgSys, arr[i])
+	}
+	IntArrSys2User(addr, size, arr);
+
+	if(arr) delete[] arr;
+	increasePC();
+}
+
+void handle_SC_PrintNum() {
+    int character = kernel->machine->ReadRegister(4);
+    SysPrintNum(character);
+   	increasePC();
+}
+
+void handle_SC_RandomNum() {
+    int result;
+    result = SysRandomNum();
+    kernel->machine->WriteRegister(2, result);
+    increasePC();
 }
 
 void ExceptionHandler(ExceptionType which)
@@ -212,13 +193,22 @@ void ExceptionHandler(ExceptionType which)
 		case SC_PrintChar:
 			handle_SC_PrintChar();
 			return;
+		case SC_PrintNum:
+            handle_SC_PrintNum();
+			return;
+		case SC_RandomNum:
+            handle_SC_RandomNum();
+			return;
+		case SC_Sort:
+			handle_SC_Sort();
+			return;
 		default:
 			cerr << "Unexpected system call " << type << "\n";
 			break;
 		}
 		break;
 	default:
-		cerr << "Unexpected user mode exception" << (int)which << "\n";
+		cerr << "Unexpected user mode exception " << (int)which << "\n";
 		break;
 	}
 	ASSERTNOTREACHED();

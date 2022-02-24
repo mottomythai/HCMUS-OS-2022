@@ -112,7 +112,7 @@ ifeq ($(hosttype),unknown)
 PROGRAMS = unknownhost
 else
 # change this if you create a new test program!
-PROGRAMS = add halt shell matmult sort segments printstring chartest
+PROGRAMS = add halt shell matmult sort segments printstring chartest help numsort random ascii
 endif
 
 all: $(PROGRAMS)
@@ -175,6 +175,31 @@ chartest.o: chartest.c
 chartest: chartest.o start.o
 	$(LD) $(LDFLAGS) start.o chartest.o -o chartest.coff
 	$(COFF2NOFF) chartest.coff chartest
+
+ascii.o: ascii.c
+	$(CC) $(CFLAGS) -c ascii.c
+ascii: ascii.o start.o
+	$(LD) $(LDFLAGS) start.o ascii.o -o ascii.coff
+	$(COFF2NOFF) ascii.coff ascii
+
+random.o: random.c
+	$(CC) $(CFLAGS) -c random.c
+random: random.o start.o
+	$(LD) $(LDFLAGS) start.o random.o -o random.coff
+	$(COFF2NOFF) random.coff random
+
+
+help.o: help.c
+	$(CC) $(CFLAGS) -c help.c
+help: help.o start.o
+	$(LD) $(LDFLAGS) start.o help.o -o help.coff
+	$(COFF2NOFF) help.coff help
+
+numsort.o: numsort.c
+	$(CC) $(CFLAGS) -c numsort.c
+numsort: numsort.o start.o
+	$(LD) $(LDFLAGS) start.o numsort.o -o numsort.coff
+	$(COFF2NOFF) numsort.coff numsort
 
 
 unknownhost:
