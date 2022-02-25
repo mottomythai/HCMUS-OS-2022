@@ -141,7 +141,10 @@ char *SysReadString(int len)
   str[len] = '\0';
   return str;
 }
-char SysReadChar() { return kernel->synchConsoleIn->GetChar(); }
+
+char SysReadChar() { 
+  return kernel->synchConsoleIn->GetChar(); 
+}
 
 void SysPrintChar(char character)
 {
@@ -163,7 +166,8 @@ char isBlank(char c)
     return c == LF || c == CR || c == TAB || c == SPACE;
 }
 
-bool compareNumVsString(int integer, const char *s) {
+bool compareNumVsString(int integer, const char *s) 
+{
     if (integer == 0) return strcmp(s, "0") == 0;
 
     int len = strlen(s);
@@ -184,50 +188,61 @@ bool compareNumVsString(int integer, const char *s) {
     return len == 0;
 }
 
-void SysPrintNum(int num) {
-    if (num == 0) return kernel->synchConsoleOut->PutChar('0');//neu = 0 thi in ra 0
+void SysPrintNum(int num) 
+{
+    if (num == 0) return kernel->synchConsoleOut->PutChar('0');  // Input = 0 -> print 0
 
-    if (num == INT32_MIN) {//neu la so hang duoi thi in ra so hang duoi = 2147483648
+    if (num == INT32_MIN) { // If num is equal to INT32_MIN -> print -2147483648
         kernel->synchConsoleOut->PutChar('-');
         for (int i = 0; i < 10; ++i)
             kernel->synchConsoleOut->PutChar("2147483648"[i]);
         return;
     }
 
-    if (num < 0) { // neu la so am
+    if (num < 0) { // Solve when num is negative
         kernel->synchConsoleOut->PutChar('-');
         num = -num;
     }
-    //chuyen so nguyen ve chuoi va in ra
-    int n = 0;
+
+    // Convert int num into num_buffer array
+    int i = 0;
     while (num) {
-        num_buffer[n++] = num % 10;
+        num_buffer[i++] = num % 10;
         num /= 10;
     }
-    for (int i = n - 1; i >= 0; --i)
-        kernel->synchConsoleOut->PutChar(num_buffer[i] + '0');
+
+    // Print out the saved characters in num_buffer array
+    for (int j = i - 1; j >= 0; --j)
+        kernel->synchConsoleOut->PutChar(num_buffer[j] + '0');
 }
 
 int SysReadNum()
 {
+    // Read input 
     memset(num_buffer, 0, sizeof(num_buffer));
     char c = kernel->synchConsoleIn->GetChar();
 
-    if (c == EOF) {
+    // Detected end of file
+    if (c == EOF)
+    {
         DEBUG(dbgSys, "(!) End of file");
         return;
     }
 
-    if (isBlank(c)) {
-        DEBUG(dbgSys, "(!) White-space found");
+    // Detected white-space
+    if (isBlank(c))
+    {
+        DEBUG(dbgSys, "(!) White-space detected");
         return;
     }
 
     int n = 0;
 
-    while (!(isBlank(c) || c == EOF)) {
+    while (!(isBlank(c) || c == EOF))
+    {
         num_buffer[n++] = c;
-        if (n > max_num_length) {
+        if (n > max_num_length)
+        {
             DEBUG(dbgSys, "Number is too long");
             return;
         }
@@ -235,57 +250,53 @@ int SysReadNum()
     }
 
     int len = strlen(num_buffer);
+    
     // Read nothing -> return 0
     if (len == 0) return 0;
 
     if (strcmp(num_buffer, "-2147483648") == 0) return INT32_MIN;
 
-    bool nega = (num_buffer[0] == '-');
+    bool neg = (num_buffer[0] == '-');
     int zeros = 0;
     bool is_leading = true;
     int num = 0;
-    for (int i = nega; i < len; ++i) {
+    for (int i = neg; i < len; ++i)
+    {
         char c = num_buffer[i];
         if (c == '0' && is_leading)
             ++zeros;
         else
             is_leading = false;
-        if (c < '0' || c > '9') {
+        if (c < '0' || c > '9')
+        {
             DEBUG(dbgSys, "Number expected but " << num_buffer << " found");
             return 0;
         }
         num = num * 10 + (c - '0');
     }
 
-    // 00,01 or -0
-    if (zeros > 1 || (zeros && (num || nega))) {
+    if (zeros > 1 || (zeros && (num || neg)))
+    {
         DEBUG(dbgSys, "Number expected but " << num_buffer << " found");
         return 0;
     }
 
-    if (nega)
-        /**
-         * This is why we need to handle -2147483648 individually:
-         * 2147483648 is larger than the range of int32
-         */
+    if (neg)
+        /* Reason we need to handle -2147483648 individually:
+         * 2147483648 is larger than the range of int32 */
         num = -num;
 
-    // It's safe to return directly if the number is small
-    if (len <= max_num_length - 2) return num;
+    // If the number is small, return it
+    if(len <= max_num_length - 2) return num;
 
-    /**
-     * We need to make sure that number is equal to the number in the buffer.
-     *
+    /* We need to make sure that number is equal to the number in the buffer.
      * It's impossible to tell whether the number is bigger
      * than INT32_MAX or smaller than INT32_MIN if it has the same length.
-     *
-     * For example: 3 000 000 000.
-     *
-     * In that case, that number will cause an overflow. However, C++
-     * doens't raise integer overflow, so we need to make sure that the input
-     * string and the output number is equal.
-     *
-     */
+     * 
+     * For example: 4.000.000.000
+     * In that case, that number will cause an overflow. However, C++ doesn't raise
+     * integer overflow, so we need to make sure that the input
+     * and the output is equal. */
     if (compareNumVsString(num, num_buffer))
         return num;
     else

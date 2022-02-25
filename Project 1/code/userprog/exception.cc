@@ -105,7 +105,6 @@ void handle_SC_PrintChar()
 {
 	char character = (char)kernel->machine->ReadRegister(4);
 	SysPrintChar(character);
-
 	increasePC();
 }
 
@@ -136,13 +135,15 @@ void handle_SC_ReadNum()
 	increasePC();
 }
 
-void handle_SC_PrintNum() {
+void handle_SC_PrintNum() 
+{
     int character = kernel->machine->ReadRegister(4);
     SysPrintNum(character);
    	increasePC();
 }
 
-void handle_SC_RandomNum() {
+void handle_SC_RandomNum() 
+{
     int result;
     result = SysRandomNum();
     kernel->machine->WriteRegister(2, result);
