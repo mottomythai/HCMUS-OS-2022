@@ -39,7 +39,6 @@
 #define SC_PrintString   46
 #define SC_ReadChar 47
 #define SC_PrintChar 48
-#define SC_Sort 100
 #define SC_PrintNum 49
 #define SC_ReadNum 51
 #define SC_RandomNum 50
@@ -72,7 +71,7 @@ int Add(int op1, int op2);
 
 void ReadString(char* str, int len);
 
-void PrintString(char* str, int len);
+void PrintString(const char* str, int len);
 
 char ReadChar();
 

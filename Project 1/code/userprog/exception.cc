@@ -51,38 +51,32 @@
 //----------------------------------------------------------------------
 
 /* Modify return point */
-void increasePC()
+void NextCommand()
 {
-	/* set previous programm counter (debugging only)*/
 	kernel->machine->WriteRegister(PrevPCReg, kernel->machine->ReadRegister(PCReg));
-	/* set programm counter to next instruction (all Instructions are 4 byte wide)*/
 	kernel->machine->WriteRegister(PCReg, kernel->machine->ReadRegister(PCReg) + 4);
-	/* set next programm counter for brach execution */
 	kernel->machine->WriteRegister(NextPCReg, kernel->machine->ReadRegister(PCReg) + 4);
 }
 
 #define MAX_STR_LEN 255
-void handleSC_ReadStr()
+void handle_SC_ReadStr()
 {
 	int strAddress = kernel->machine->ReadRegister(4);
 	int strLen = kernel->machine->ReadRegister(5);
 	if (strLen >= MAX_STR_LEN)
 	{
-		// TODO: Rewrite this
-		char errMsg[] = "String too long";
-		SysPrintString(errMsg, strlen(errMsg));
+		SysPrintString( "String too long", 16);
 		SysHalt();
-		// END_TODO
 	}
 
 	char *str = SysReadString(strLen);
 
 	System2User(strAddress, strlen(str), str);
 	delete[] str;
-	increasePC();
+	NextCommand();
 }
 
-void handleSC_PrintStr()
+void handle_SC_PrintStr()
 {
 	int strAddress = kernel->machine->ReadRegister(4);
 	int strLimit = kernel->machine->ReadRegister(5);
@@ -91,63 +85,43 @@ void handleSC_PrintStr()
 	DEBUG(dbgSys, "\n[DEBUG]: string '" << buff << "' has the length of " << strlen(buff) << "");
 	SysPrintString(buff, strlen(buff));
 	delete buff;
-	increasePC();
+	NextCommand();
 }
 
 void handle_SC_ReadChar()
 {
 	char result = SysReadChar();
 	kernel->machine->WriteRegister(2, (int)result);
-	increasePC();
+	NextCommand();
 }
 
 void handle_SC_PrintChar()
 {
 	char character = (char)kernel->machine->ReadRegister(4);
 	SysPrintChar(character);
-	increasePC();
-}
-
-void handle_SC_Sort()
-{
-	DEBUG(dbgSys, "Enter Sorting:");
-	int addr = kernel->machine->ReadRegister(4);
-	int size = kernel->machine->ReadRegister(5);
-
-	int *arr = SysSort(addr, size);
-
-	DEBUG(dbgSys, "Sorting:");
-	if(debug->IsEnabled(dbgSys))
-	{
-		for(int i = 0; i < size; ++i)
-			DEBUG(dbgSys, arr[i])
-	}
-	IntArrSys2User(addr, size, arr);
-
-	if(arr) delete[] arr;
-	increasePC();
+	NextCommand();
 }
 
 void handle_SC_ReadNum()
 {
 	int result = SysReadNum();
 	kernel->machine->WriteRegister(2, result);
-	increasePC();
+	NextCommand();
 }
 
-void handle_SC_PrintNum() 
+void handle_SC_PrintNum()
 {
-    int character = kernel->machine->ReadRegister(4);
-    SysPrintNum(character);
-   	increasePC();
+	int character = kernel->machine->ReadRegister(4);
+	SysPrintNum(character);
+	NextCommand();
 }
 
-void handle_SC_RandomNum() 
+void handle_SC_RandomNum()
 {
-    int result;
-    result = SysRandomNum();
-    kernel->machine->WriteRegister(2, result);
-    increasePC();
+	int result;
+	result = SysRandomNum();
+	kernel->machine->WriteRegister(2, result);
+	NextCommand();
 }
 
 void ExceptionHandler(ExceptionType which)
@@ -164,17 +138,17 @@ void ExceptionHandler(ExceptionType which)
 		break;
 
 	case PageFaultException:	// No valid translation found
-	case ReadOnlyException:		// Write attempted to page marked 
+	case ReadOnlyException:		// Write attempted to page marked
 								// "read-only"
-	case BusErrorException:		// Translation resulted in an 
+	case BusErrorException:		// Translation resulted in an
 								// invalid physical address
-	case AddressErrorException:	// Unaligned reference or one that
+	case AddressErrorException: // Unaligned reference or one that
 								// was beyond the end of the
 								// address space
 	case OverflowException:		// Integer overflow in add or sub.
-	case IllegalInstrException:	// Unimplemented or reserved instr.
+	case IllegalInstrException: // Unimplemented or reserved instr.
 	case NumExceptionTypes:
-		PrintString("<!> 1 error occurs", 18);
+		SysPrintString("<!> 1 error occurs", 18);
 		cerr << "(!) Error " << which << " occurs\n";
 		SysHalt();
 		ASSERTNOTREACHED();
@@ -202,7 +176,7 @@ void ExceptionHandler(ExceptionType which)
 			/* Prepare Result */
 			kernel->machine->WriteRegister(2, (int)result);
 
-			increasePC();
+			NextCommand();
 
 			return;
 
@@ -211,10 +185,10 @@ void ExceptionHandler(ExceptionType which)
 			break;
 
 		case SC_ReadString:
-			handleSC_ReadStr();
+			handle_SC_ReadStr();
 			return;
 		case SC_PrintString:
-			handleSC_PrintStr();
+			handle_SC_PrintStr();
 			return;
 		case SC_ReadChar:
 			handle_SC_ReadChar();
@@ -226,13 +200,10 @@ void ExceptionHandler(ExceptionType which)
 			handle_SC_ReadNum();
 			return;
 		case SC_PrintNum:
-            handle_SC_PrintNum();
+			handle_SC_PrintNum();
 			return;
 		case SC_RandomNum:
-            handle_SC_RandomNum();
-			return;
-		case SC_Sort:
-			handle_SC_Sort();
+			handle_SC_RandomNum();
 			return;
 		default:
 			cerr << "Unexpected system call " << type << "\n";

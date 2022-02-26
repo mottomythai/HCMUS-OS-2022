@@ -211,17 +211,8 @@ PrintChar:
 	j	$31
 	.end PrintChar
 
-	.globl Sort
-	.ent	Sort
-Sort:
-	addiu $2,$0,SC_Sort
-	syscall
-	j	$31
-	.end Sort
-
 	.globl ReadNum
 	.ent	ReadNum
-
 ReadNum:
 	addiu $2,$0,SC_ReadNum
 	syscall
@@ -230,7 +221,6 @@ ReadNum:
 
 	.globl PrintNum
 	.ent	PrintNum
-
 PrintNum:
 	addiu $2,$0,SC_PrintNum
 	syscall
