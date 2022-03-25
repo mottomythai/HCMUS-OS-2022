@@ -7,13 +7,13 @@ Create      |<ul><li>[ ] Hạo</li><li>[ ] Thái</li><li>[x] Trang</li></ul>|<ul
 Open        |<ul><li>[ ] Hạo</li><li>[ ] Thái</li><li>[x] Trang</li></ul>|<ul><li>[]</li></ul>
 Close       |<ul><li>[ ] Hạo</li><li>[ ] Thái</li><li>[x] Trang</li></ul>|<ul><li>[]</li></ul>
 Read        |<ul><li>[ ] Hạo</li><li>[ ] Thái</li><li>[x] Trang</li></ul>|<ul><li>[]</li></ul>
-Write       |<ul><li>[ ] Hạo</li><li>[ ] Thái</li><li>[ ] Trang</li></ul>|<ul><li>[ ]</li></ul>
-Seek        |<ul><li>[ ] Hạo</li><li>[ ] Thái</li><li>[ ] Trang</li></ul>|<ul><li>[ ]</li></ul>
-Remove      |<ul><li>[ ] Hạo</li><li>[ ] Thái</li><li>[ ] Trang</li></ul>|<ul><li>[ ]</li></ul>
+Write       |<ul><li>[ ] Hạo</li><li>[x] Thái</li><li>[ ] Trang</li></ul>|<ul><li>[ ]</li></ul>
+Seek        |<ul><li>[ ] Hạo</li><li>[x] Thái</li><li>[ ] Trang</li></ul>|<ul><li>[ ]</li></ul>
+Remove      |<ul><li>[ ] Hạo</li><li>[x] Thái</li><li>[ ] Trang</li></ul>|<ul><li>[ ]</li></ul>
 **Userprog**|**Userprog**|**Userprog**
 Createfile  |<ul><li>[ ] Hạo</li><li>[ ] Thái</li><li>[x] Trang</li></ul>|<ul><li>[]</li></ul>
 Cat         |<ul><li>[ ] Hạo</li><li>[ ] Thái</li><li>[ ] Trang</li></ul>|<ul><li>[ ]</li></ul>
-Copy        |<ul><li>[ ] Hạo</li><li>[ ] Thái</li><li>[ ] Trang</li></ul>|<ul><li>[ ]</li></ul>
+Copy        |<ul><li>[ ] Hạo</li><li>[x] Thái</li><li>[ ] Trang</li></ul>|<ul><li>[ ]</li></ul>
 Delete      |<ul><li>[ ] Hạo</li><li>[ ] Thái</li><li>[ ] Trang</li></ul>|<ul><li>[ ]</li></ul>
 Concatenate |<ul><li>[ ] Hạo</li><li>[ ] Thái</li><li>[ ] Trang</li></ul>|<ul><li>[ ]</li></ul>
 
