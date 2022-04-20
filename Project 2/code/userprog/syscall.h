@@ -48,6 +48,7 @@
 
 
 #define MaxFileLength 32
+#define MAX_STR_LEN 255
 
 #ifndef IN_ASM
 

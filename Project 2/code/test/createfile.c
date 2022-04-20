@@ -2,12 +2,12 @@
 
 int main()
 {
-   	char fileName[256];
+   	char fileName[MAX_STR_LEN];
     int n;
 
     PrintString("Enter length of filename: ",26);
     n = ReadNum();
-    PrintString("Enter file's name: ",50);
+    PrintString("Enter filename: ",50);
     ReadString(fileName, n);
 
     if (CreateFile(fileName) == 0) {
@@ -16,7 +16,7 @@ int main()
         PrintString(" successfully created!\n",23);
     } 
 	else
-        PrintString(" can't be created!\n",23);
+        PrintString("Error creating file!\n",23);
 
 	Halt();
 }

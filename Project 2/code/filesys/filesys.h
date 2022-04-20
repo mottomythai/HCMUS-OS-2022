@@ -70,18 +70,17 @@ class FileSystem {
         delete[] openFileName;
 	}
 
-bool Close(int id){
-		if (id < 2 || id > FILE_MAX) return FALSE;
-        if (openFile[id]) {
-			delete openFileName[id];
-            openFileName[id] = NULL;
-			delete openFile[id];
-            openFile[id] = NULL;
-			DEBUG(dbgSys, "\nClosing file with ID - " << id << " successfully!");
-            return TRUE;
+int Close(int id){
+		 if (id >= 0 && id <= 9) //Chi xu li khi file id nam trong [0, 9]
+    {
+        if (openFile[id]) //neu da mo file thanh cong
+        {
+            delete openFile[id]; //Xoa vung nho luu tru file
+            openFile[id] = NULL; //Gan vung nho NULL
+            return 0;
         }
-		DEBUG(dbgSys, "\nFile with ID - " << id << " has already closed!");
-        return FALSE;
+    }
+    return -1;
 }
 
 int Read(char* buffer, int charCount, int index){
@@ -168,7 +167,7 @@ class FileSystem {
     int Read(char* buffer, int charCount, int index);
     bool isOpen(char* filename);
 	
-     bool Close(int id);
+    int Close(int id);
 
     OpenFile** openFile; 
 	char** openFileName;

@@ -1,6 +1,5 @@
 #include "../userprog/syscall.h"
 
-#define MAX_STR_LEN 255
 int main()
 {
     char str[MAX_STR_LEN];
