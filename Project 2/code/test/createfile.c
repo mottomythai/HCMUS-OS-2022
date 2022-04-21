@@ -16,7 +16,7 @@ int main()
         PrintString(" successfully created!\n",23);
     } 
 	else
-        PrintString("Error creating file!\n",23);
+        PrintString("=> Error creating file!\n",26);
 
 	Halt();
 }

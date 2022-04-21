@@ -112,7 +112,7 @@ ifeq ($(hosttype),unknown)
 PROGRAMS = unknownhost
 else
 # change this if you create a new test program!
-PROGRAMS = add halt shell matmult sort segments string_io char_io help  random ascii num_io createfile cat 
+PROGRAMS = add halt shell matmult sort segments string_io char_io help  random ascii num_io createfile cat copy concate
 endif
 
 all: $(PROGRAMS)

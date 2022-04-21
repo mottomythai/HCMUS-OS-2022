@@ -5,7 +5,7 @@ int main()
     char content[MAX_STR_LEN];
     char fileName[MAX_STR_LEN];
     int n;
-    int fileid;
+    OpenFileId fileid;
 
     PrintString("Enter length of filename: ",26);
     n = ReadNum();

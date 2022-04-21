@@ -213,6 +213,7 @@ void handle_SC_Remove()
 
 	delete[] fileName;
 	NextCommand();
+}
 
 void ExceptionHandler(ExceptionType which)
 {
