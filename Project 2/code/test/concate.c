@@ -2,32 +2,36 @@
 
 int main()
 {
-    char *buff1, *buff2, *filename1, *filename2;
-    int size1, size2, namesize;
-    PrintString("Enter first file's name size: ", 31);
+    char buff1[MAX_STR_LEN], buff2[MAX_STR_LEN], filename1[MAX_STR_LEN], filename2[MAX_STR_LEN];
+    int namesize;
+    OpenFileId file1;
+    OpenFileId file2;
+
+    PrintString("Enter first file\'s name size: ", 31);
     namesize = ReadNum();
-    PrintString("Enter first file name: ", 24);
+    PrintString("Enter first file name: ", 25);
     ReadString(filename1, namesize);
-    PrintString("Enter data length within file: ", 32);
-    size1 = ReadNum();
-    PrintString("Enter second file's name size: ", 31);
+    ReadNum();
+
+    PrintString("Enter second file\'s name size: ", 32);
     namesize = ReadNum();
-    PrintString("Enter second file name: ", 26);
+    PrintString("Enter second file name: ", 25);
     ReadString(filename2, namesize);
-    PrintString("Enter data length within file: ", 32);
-    size2 = ReadNum();
-    OpenFileId file1 = Open(filename1);
-    OpenFileId file2 = Open(filename2);
+    ReadNum();
+    
+    file1 = Open(filename1);
+    file2 = Open(filename2);
     if (file1 == -1 || file2 == -1)
     {
         PrintString("Unable to open file(s)", 23);
         Halt();
     }
     
-    Read(buff1, size1, file1);
-    Read(buff2, size2, file2);
-    PrintString(buff1, size1);
-    PrintString(buff2, size2);
+    Read(buff1, MAX_STR_LEN, file1);
+    Read(buff2, MAX_STR_LEN, file2);
+    PrintString(buff1, MAX_STR_LEN);
+    PrintString(buff2, MAX_STR_LEN);
+    PrintChar('\n');
     Close(file1);
     Close(file2);
 
