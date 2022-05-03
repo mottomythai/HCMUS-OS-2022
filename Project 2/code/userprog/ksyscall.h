@@ -379,4 +379,30 @@ int SysRead(char* buffer, int charCount, int fileId)
   return kernel->fileSystem->Read(buffer, charCount, fileId);
 }
 
+int SysWrite(char* buffer, int size, int fileid)
+{
+  if (fileid == 1)
+  {
+    return kernel->synchConsoleOut->PutString(buffer, size);
+  }
+
+  return kernel->fileSystem->Write(buffer, size, fileid);
+}
+
+int SysSeek(int position, int fileid)
+{
+  if (fileid <= 1)
+  {
+    DEBUG(dbgSys, "\nCannot seek in console!");
+    return -1;
+  }
+
+  return kernel->fileSystem->Seek(position, fileid);
+}
+
+int SysRemove(char *name)
+{
+  return kernel->fileSystem->Remove(name);
+}
+
 #endif /* ! __USERPROG_KSYSCALL_H__ */

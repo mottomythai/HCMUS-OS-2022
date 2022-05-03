@@ -112,7 +112,7 @@ ifeq ($(hosttype),unknown)
 PROGRAMS = unknownhost
 else
 # change this if you create a new test program!
-PROGRAMS = add halt shell matmult sort segments string_io char_io help numsort random ascii num_io
+PROGRAMS = add halt shell matmult sort segments string_io char_io help  random ascii num_io createfile cat copy delete
 endif
 
 all: $(PROGRAMS)
@@ -207,7 +207,36 @@ numsort: numsort.o start.o
 	$(LD) $(LDFLAGS) start.o numsort.o -o numsort.coff
 	$(COFF2NOFF) numsort.coff numsort
 
+createfile.o: createfile.c
+	$(CC) $(CFLAGS) -c createfile.c
+createfile: createfile.o start.o
+	$(LD) $(LDFLAGS) start.o createfile.o -o createfile.coff
+	$(COFF2NOFF) createfile.coff createfile
 
+cat.o: cat.c
+	$(CC) $(CFLAGS) -c cat.c
+cat: cat.o start.o
+	$(LD) $(LDFLAGS) start.o cat.o -o cat.coff
+	$(COFF2NOFF) cat.coff cat
+
+concate.o: concate.c
+	$(CC) $(CFLAGS) -c concate.c
+concate: concate.o start.o
+	$(LD) $(LDFLAGS) start.o concate.o -o concate.coff
+	$(COFF2NOFF) concate.coff concate
+
+copy.o: copy.c
+	$(CC) $(CFLAGS) -c copy.c
+copy: copy.o start.o
+	$(LD) $(LDFLAGS) start.o copy.o -o copy.coff
+	$(COFF2NOFF) copy.coff copy
+
+delete.o: delete.c
+	$(CC) $(CFLAGS) -c delete.c
+delete: delete.o start.o
+	$(LD) $(LDFLAGS) start.o delete.o -o delete.coff
+	$(COFF2NOFF) delete.coff delete
+	
 unknownhost:
 	@echo Host type could not be determined.
 	@echo make is terminating.

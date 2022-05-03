@@ -219,6 +219,19 @@ concate: concate.o start.o
 	$(LD) $(LDFLAGS) start.o concate.o -o concate.coff
 	$(COFF2NOFF) concate.coff concate
 
+copy.o: copy.c
+	$(CC) $(CFLAGS) -c copy.c
+copy: copy.o start.o
+	$(LD) $(LDFLAGS) start.o copy.o -o copy.coff
+	$(COFF2NOFF) copy.coff copy
+
+delete.o: delete.c
+	$(CC) $(CFLAGS) -c delete.c
+delete: delete.o start.o
+	$(LD) $(LDFLAGS) start.o delete.o -o delete.coff
+	$(COFF2NOFF) delete.coff delete
+	
+
 unknownhost:
 	@echo Host type could not be determined.
 	@echo make is terminating.

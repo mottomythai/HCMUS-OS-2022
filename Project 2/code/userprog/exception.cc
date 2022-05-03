@@ -177,6 +177,44 @@ void handle_SC_Read()
    	NextCommand();
 }
 
+void handle_SC_Write()
+{
+	int virtAddr = kernel->machine->ReadRegister(4);
+    int charCount = kernel->machine->ReadRegister(5);
+    int fileId = kernel->machine->ReadRegister(6);
+    char* buffer = User2System(virtAddr, charCount);
+    DEBUG(dbgFile,"Write " << charCount << " chars to file " << fileId << "\n");
+
+    kernel->machine->WriteRegister(2, SysWrite(buffer, charCount, fileId));
+    System2User(virtAddr, charCount, buffer);
+
+    delete[] buffer;
+   	NextCommand();
+}
+
+void handle_SC_Seek()
+{
+	int seekpos = kernel->machine->ReadRegister(4);
+	int fileid = kernel->machine->ReadRegister(5);
+
+	kernel->machine->WriteRegister(2, SysSeek(seekpos, fileid));
+
+	NextCommand();
+}
+
+void handle_SC_Remove()
+{
+	int virtAddr;
+    char *fileName;
+    virtAddr = kernel->machine->ReadRegister(4); 
+    fileName = User2System(virtAddr, MaxFileLength + 1);
+
+	kernel->machine->WriteRegister(2, SysRemove(fileName));
+
+	delete[] fileName;
+	NextCommand();
+}
+
 void ExceptionHandler(ExceptionType which)
 {
 	int type = kernel->machine->ReadRegister(2);
@@ -270,6 +308,16 @@ void ExceptionHandler(ExceptionType which)
 		case SC_Read:
 			handle_SC_Read();
             return;
+		case SC_Write:
+			handle_SC_Write();
+			return;
+		case SC_Seek:
+			handle_SC_Seek();
+			return;
+		case SC_Remove:
+			handle_SC_Remove();
+			return;
+			
 		default:
 			cerr << "Unexpected system call " << type << "\n";
 			break;
